@@ -7,4 +7,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('rest/fbv/', views.FBV_List),
     path('rest/fbv/<int:pk>/', views.FBV_pk),
+    path('rest/cbv/', views.CBV_List.as_view()),
 ]

@@ -4,6 +4,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from .models import Guest
 from .serializers import GuestSerializer, ReservationSerializer, MovieSerializer
+from rest_framework.views import APIView
 
 @api_view(['GET', 'POST'])
 def FBV_List(request):
@@ -42,3 +43,13 @@ def FBV_pk(request, pk):
         guest.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
     
+class CBV_List(APIView):
+    def get(self, request):
+        guest = Guest.objects.all()
+        serializer = GuestSerializer(guest, many=True)
+        return Response(serializer.data)
+    def post(self, request):
+        serializer = GuestSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)

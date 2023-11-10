@@ -2,7 +2,7 @@ from django.shortcuts import render
 from rest_framework.decorators import api_view
 from rest_framework import status
 from rest_framework.response import Response
-from .models import Guest
+from .models import Guest, Movie, Reservation
 from .serializers import GuestSerializer, ReservationSerializer, MovieSerializer
 from rest_framework.views import APIView
 from django.http import Http404
@@ -77,3 +77,13 @@ class CBV_pk(APIView):
         guest = self.get_object(pk)
         guest.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+    
+@api_view(['GET'])
+def find_movie(request):
+    movies = Movie.objects.filter(
+        movie=request.data['movie'],
+        hall=request.data['hall'],
+    )
+    serializer = MovieSerializer(movies, many=True)
+    return Response(serializer.data)
+

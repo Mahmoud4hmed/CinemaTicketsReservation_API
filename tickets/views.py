@@ -6,6 +6,9 @@ from .models import Guest, Movie, Reservation
 from .serializers import GuestSerializer, ReservationSerializer, MovieSerializer
 from rest_framework.views import APIView
 from django.http import Http404
+from rest_framework.authentication import BaseAuthentication, TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
+from rest_framework import generics
 
 @api_view(['GET', 'POST'])
 def FBV_List(request):
@@ -85,5 +88,42 @@ def find_movie(request):
         hall=request.data['hall'],
     )
     serializer = MovieSerializer(movies, many=True)
+    
     return Response(serializer.data)
 
+@api_view(['POST'])
+def new_reservation(request):
+    movie = Movie.objects.get(
+        hall = request.data['hall'],
+        movie = request.data['movie'],
+    )
+    guest = Guest()
+    guest.name = request.data['name']
+    guest.phone = request.data['phone']
+    guest.save()
+    
+    reservation = Reservation()
+    reservation.guest = guest
+    reservation.movie = movie
+    reservation.save()
+    
+    serializer = ReservationSerializer(reservation)
+    return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+@api_view(['GET'])
+def reservation_list(request):
+    reservations = Reservation.objects.all()
+    serializer = ReservationSerializer(reservations, many=True)
+    return Response(serializer.data)
+
+class generics_list(generics.ListCreateAPIView):
+    queryset = Guest.objects.all()
+    serializer_class = GuestSerializer
+    authentication_classes = [TokenAuthentication]
+    # permission_classes = [IsAuthenticated]
+    
+class generics_pk(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Guest.objects.all()
+    serializer_class = GuestSerializer
+    authentication_classes = [TokenAuthentication]
+    # permission_classes = [IsAuthenticated]

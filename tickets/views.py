@@ -9,6 +9,7 @@ from django.http import Http404
 from rest_framework.authentication import BaseAuthentication, TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import generics
+from django.shortcuts import get_object_or_404
 
 @api_view(['GET', 'POST'])
 def FBV_List(request):
@@ -60,7 +61,7 @@ class CBV_List(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 class CBV_pk(APIView):
-    def get_object(self, pk):
+    def get_object_or_404(self, pk):
         try:
             return Guest.objects.get(pk=pk)
         except Guest.DoesNotExist:
